@@ -21,6 +21,8 @@ Beyond data structures, this assignment reinforces three important programming c
 
 5. To be eligible for partial credit on select functions, use the intermediate variable names specified in each task's ***Function specification*** section.
 
+6. When a function raises a `ValueError` or `KeyError`, Python may print a Traceback message above the error line. This is normal behavior and will not affect your grade — we only check that the correct error type and message are produced. You may ignore any Traceback output shown when testing your functions.
+
 
 ## The Payroll System
 
@@ -116,7 +118,7 @@ New employees are **not** added to `change_log`. The change log is only for upda
 - Raises: `ValueError` for any invalid or missing field, or a duplicate name
 - Intermediate variable for partial credit: `fields` — the list produced by calling `.split()` on `input_str` [5 pts]
 
-***Function demonstration.***
+***Function demonstration.*** A Traceback message may be displayed above the error line — this is acceptable.
 
 ```python
 >>> add_employee("John-Smith employee engineering salary 75000")
@@ -140,7 +142,22 @@ ValueError: Expected 5 fields, got 2
 
 ***Hint.***
 - Use `str.split()` with no arguments — it splits on any whitespace and handles extra spaces automatically.
-- To safely convert a string to a float, use a `try`/`except` block: put `float(pay_amount_str)` inside `try`, and raise your `ValueError` in the `except` clause.
+- For each validation check, use an `if` statement and a `raise` statement together. The general pattern is:
+
+  ```python
+  if <condition is violated>:
+      raise ValueError("descriptive message about what went wrong")
+  ```
+
+  For example, to check that `level` is valid:
+
+  ```python
+  if level not in VALID_LEVELS:
+      raise ValueError(f"Invalid level: {level}")
+  ```
+
+  The `raise` statement immediately stops the function and signals the error — no `return` is needed.
+- To safely convert a string to a float, use a `try`/`except` block: put `float(pay_amount_str)` inside `try`, and use `raise` inside the `except` clause to raise your own `ValueError`.
 - To check set membership, use the `in` operator: `name in employee_set`.
 
 
@@ -200,7 +217,7 @@ These three functions retrieve information from the global variables without mod
 
 **`get_employee(name)`** retrieves the full record for a single employee by name.
 
-***Function specification.***
+***Function specification.*** A Traceback message may be displayed above the error line — this is acceptable.
 - Input: `name` (str)
 - Return: the employee's record dictionary from `employee_records` (dict)
 - Raises: `KeyError` if `name` is not found in `employee_records`
@@ -214,6 +231,8 @@ These three functions retrieve information from the global variables without mod
 >>> get_employee("Nobody")
 KeyError: 'Nobody'
 ```
+
+
 
 ***Hint.*** Accessing `employee_records[name]` directly will raise a `KeyError` automatically if the key does not exist — you do not need to raise it yourself.
 
@@ -276,7 +295,7 @@ KeyError: 'Nobody'
 - Raises: `KeyError` if the employee is not found; `ValueError` if the benefit code is not in `BENEFITS`
 - Graded on: the state of `employee_benefits` after the call
 
-***Function demonstration.***
+***Function demonstration.*** A Traceback message may be displayed above the error line — this is acceptable.
 
 ```python
 >>> assign_benefit("John-Smith", "healthcare")
@@ -294,6 +313,7 @@ ValueError: Invalid benefit code: dental
 >>> assign_benefit("Nobody", "healthcare")
 KeyError: 'Nobody'
 ```
+
 
 ***Hint.*** Use `.add()` to insert an element into a set. Unlike a list's `.append()`, set `.add()` silently does nothing if the value is already present — that is exactly the behavior you want here.
 
@@ -336,7 +356,9 @@ The `name` field identifies which employee's record was snapshotted, and serves 
 # old_record still shows 75000.0 — the snapshot was frozen at the time save_to_change_log was called.
 ```
 
-***Hint.*** Use `copy.deepcopy(employee_records[name])` to create the frozen snapshot. `import copy` is already included at the top of `payroll.py` — you do not need to import it again.
+***Hint.***
+- Use `copy.deepcopy(employee_records[name])` to create the frozen snapshot. `import copy` is already included at the top of `payroll.py` — you do not need to import it again.
+- `change_log[-1]` accesses the last element of the list. In Python, negative indices count from the end, so `[-1]` always gives you the most recently appended entry — which is exactly the snapshot just saved.
 
 
 ### Task 4.2 — Update an Employee's Pay [5 Points]
@@ -355,6 +377,24 @@ The `name` field identifies which employee's record was snapshotted, and serves 
 - Raises: `KeyError` if employee not found; `ValueError` if amount is not numeric
 - Graded on: state of `employee_records` and `change_log` after the call
 
+***Function demonstration.*** A Traceback message may be displayed above the error line — this is acceptable.
+
+```python
+# Assume John-Smith is already registered with pay_amount 75000.0
+
+>>> update_employee_pay("John-Smith", 80000)
+# employee_records["John-Smith"]["pay_amount"] → 80000.0
+# change_log[-1] → {'name': 'John-Smith', 'old_record': {..., 'pay_amount': 75000.0}}
+
+>>> update_employee_pay("Nobody", 50000)
+KeyError: 'Nobody'
+
+>>> update_employee_pay("John-Smith", "abc")
+ValueError: Invalid pay amount: abc
+```
+
+
+
 
 ### Task 4.3 — Update an Employee's Level [5 Points]
 
@@ -371,6 +411,24 @@ The `name` field identifies which employee's record was snapshotted, and serves 
 - Return: none
 - Raises: `KeyError` if employee not found; `ValueError` if level is not in `VALID_LEVELS`
 - Graded on: state of `employee_records` and `change_log` after the call
+
+***Function demonstration.*** A Traceback message may be displayed above the error line — this is acceptable.
+
+```python
+# Assume John-Smith is registered at level 'employee'
+
+>>> update_employee_level("John-Smith", "manager")
+# employee_records["John-Smith"]["level"] → 'manager'
+# change_log[-1] → {'name': 'John-Smith', 'old_record': {..., 'level': 'employee'}}
+
+>>> update_employee_level("John-Smith", "intern")
+ValueError: Invalid level: intern
+
+>>> update_employee_level("Nobody", "manager")
+KeyError: 'Nobody'
+```
+
+
 
 
 ### Task 4.4 — Remove an Employee [15 Points]
@@ -391,7 +449,7 @@ The `name` field identifies which employee's record was snapshotted, and serves 
 - Raises: `KeyError` if employee not found
 - Graded on: state of all four global tracking structures and `change_log` after the call
 
-***Function demonstration.***
+***Function demonstration.*** A Traceback message may be displayed above the error line — this is acceptable.
 
 ```python
 # Before: employee_list = ['John-Smith'], employee_records has John-Smith's entry
@@ -406,6 +464,8 @@ The `name` field identifies which employee's record was snapshotted, and serves 
 >>> remove_employee("Nobody")
 KeyError: 'Nobody'
 ```
+
+
 
 ***Hint.***
 - Use `employee_list.remove(name)` to remove a value by content. This is different from `del employee_list[index]`, which removes by position.
