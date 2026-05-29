@@ -25,12 +25,47 @@ change_log = []
 # Part 1 — Employee Registration
 
 def add_employee(input_str):
-    pass
+    """
+    Input: input_str (str)
+    Return: the newly created record dictionary for the employee (dict)
+    Raises: ValueError for any invalid or missing field, or a duplicate name
+    """
+
+    split_string = input_str.split(' ')
+    if len(split_string) != 5:
+        raise ValueError(f"Expected 5 fields, got {len(split_string)}")
+    if split_string[0] in employee_set:
+        raise ValueError(f"Name already exists: {split_string[0]}")
+    if split_string[1] not in VALID_LEVELS:
+        raise ValueError(f"Invalid level: {split_string[1]}")
+    if split_string[2] not in VALID_DEPARTMENTS:
+        raise ValueError(f"Invalid department: {split_string[2]}")
+    if split_string[3] not in VALID_PAY_TYPES:
+       raise ValueError(f"Invalid pay type: {split_string[3]}")
+    try:
+        pay_amount_converted = float(split_string[4])
+    except:
+       raise ValueError(f"Invalid pay amount: {split_string[4]}")
+    employee_list.append(split_string[0])
+    employee_set.add(split_string[0])
+    employee_records[split_string[0]] = {"level": split_string[1], "dept": split_string[2], "pay_type": split_string[3], "pay_amount": pay_amount_converted}
+    employee_benefits[split_string[0]] = set()
 
 
 def run_registration():
-    pass
+   while True:
+       counter = 0
+       new_employee = input("Enter employee info (or 'quit' to stop): ")
+       if new_employee == 'quit':
+           break
+       try:
+           add_employee(new_employee)
+           print(f"Employee {new_employee.split()[0]} added successfully.")
+           counter += 1
+       except ValueError as err:
+           print(str(err))
 
+run_registration()
 
 # Part 2 — Accessors
 
