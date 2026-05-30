@@ -51,35 +51,67 @@ def add_employee(input_str):
     employee_records[split_string[0]] = {"level": split_string[1], "dept": split_string[2], "pay_type": split_string[3], "pay_amount": pay_amount_converted}
     employee_benefits[split_string[0]] = set()
 
-
 def run_registration():
-   while True:
-       counter = 0
+    """
+    Input: none
+    Return: none
+    Graded on: terminal output — your printed output must match the example below exactly, including punctuation, capitalization, and spacing.
+    """
+    counter = 0
+    while True:
        new_employee = input("Enter employee info (or 'quit' to stop): ")
        if new_employee == 'quit':
+           print(counter, "employee(s) registered.")
            break
        try:
            add_employee(new_employee)
            print(f"Employee {new_employee.split()[0]} added successfully.")
            counter += 1
        except ValueError as err:
-           print(str(err))
+           print("Error: " + str(err) + ". Please try again.")
 
 run_registration()
 
 # Part 2 — Accessors
 
 def get_employee(name):
-    pass
+    """
+    Input: name (str)
+    Return: the employee's record dictionary from employee_records (dict)
+    Raises: KeyError if name is not found in employee_records
+    """
+    if name in employee_records:
+        return employee_records[name]
+    else: raise KeyError(name)
 
+# print(get_employee(input("Enter employee name: ")))
 
 def get_employees_by_department(dept):
-    pass
+    """
+    Input: dept (str)
+    Return: a list of employee names whose dept field matches the argument; an empty list if none are found (list)
+    """
+    particular_department_list = []
+    for i in employee_records:
+        if employee_records[i]["dept"] == dept:
+            particular_department_list.append(i)
+
+    return particular_department_list
+
+# print(get_employees_by_department("executive"))
 
 
 def get_employees_by_level(level):
-    pass
+    """
+    Input: level (str)
+    Return: a list of employee names whose level field matches the argument; an empty list if none are found (list)
+    """
+    particular_level_list = []
+        for i in employee_records:
+            if employee_records[i]["level"] == level:
+                particular_level_list.append(i)
 
+    return particular_level_list
 
 # Part 3 — Benefit Assignment
 
